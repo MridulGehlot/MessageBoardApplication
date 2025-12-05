@@ -7,10 +7,30 @@ public class DataModel
 private static Map<String,User> registeredUsers=new HashMap<>();
 private static Map<String,Session> loggedInUsers=new HashMap<>();
 private static Map<String,Card> unProcessedRequests=new HashMap<>();
+private static LinkedList<Message> messages=new LinkedList<>();
 static
 {
 initDataModel();
 }
+
+public static void addMessage(Message message)
+{
+synchronized(messages)
+{
+messages.addFirst(message);
+}
+}
+public static Message [] getMessages(int count)
+{
+synchronized(messages)
+{
+if(count>messages.size()) count=messages.size();
+Message [] messagesArray=new Message[count];
+for(int i=0;i<count;i++) messagesArray[i]=messages.get(i);
+return messagesArray;
+}
+}
+
 public static void addUnProcessedRequest(Card card)
 {
 synchronized(unProcessedRequests)
@@ -47,6 +67,22 @@ synchronized(loggedInUsers)
 loggedInUsers.remove(username);
 }
 }
+public static User getUser(String username)
+{
+synchronized(registeredUsers)
+{
+return registeredUsers.get(username);
+}
+}
+
+public static Session getUserSession(String username)
+{
+synchronized(loggedInUsers)
+{
+return loggedInUsers.get(username);
+}
+}
+
 public static String [] getLoggedInUsers()
 {
 SortedSet<String> tree=new TreeSet<>();
