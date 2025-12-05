@@ -74,6 +74,14 @@ public void windowClosing(WindowEvent ev)
 System.exit(0);
 }
 });
+loginButton.addActionListener(new ActionListener(){
+public void actionPerformed(ActionEvent ev)
+{
+MessageBoardFrame mbf=new MessageBoardFrame("Mridul",LoginDialog.this);
+LoginDialog.this.setVisible(false);
+mbf.setVisible(true);
+}
+});
 }
 }
 class Main
