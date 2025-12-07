@@ -1,8 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+interface LoginDialogEventHandler
+{
+public void onLoginDialogClosed();
+public void onLoginButtonClicked(String username,String password);
+}
 class LoginDialog extends JDialog
 {
+private LoginDialogEventHandler loginDialogEventHandler;
 private Image image;
 private JLabel titleLabel;
 private JLabel usernameLabel;
@@ -71,24 +77,55 @@ private void addListeners()
 addWindowListener(new WindowAdapter(){
 public void windowClosing(WindowEvent ev)
 {
-System.exit(0);
+loginDialogEventHandler.onLoginDialogClosed();
 }
 });
 loginButton.addActionListener(new ActionListener(){
 public void actionPerformed(ActionEvent ev)
 {
-MessageBoardFrame mbf=new MessageBoardFrame("Mridul",LoginDialog.this);
-LoginDialog.this.setVisible(false);
-mbf.setVisible(true);
+String username=usernameTextField.getText().trim();
+if(username.length()==0)
+{
+JOptionPane.showMessageDialog(LoginDialog.this,"Username is Required");
+usernameTextField.requestFocus();
+return;
+}
+String password=new String(passwordField.getPassword());
+password=password.trim();
+if(password.length()==0)
+{
+JOptionPane.showMessageDialog(LoginDialog.this,"Password is Required");
+passwordField.requestFocus();
+return;
+}
+disableAll();
+loginDialogEventHandler.onLoginButtonClicked(username,password);
 }
 });
 }
+public void disableAll()
+{
+this.usernameTextField.setEnabled(false);
+this.passwordField.setEnabled(false);
+this.loginButton.setEnabled(false);
 }
-class Main
+public void enableAll()
 {
-public static void main(String gg[])
+this.usernameTextField.setEnabled(true);
+this.passwordField.setEnabled(true);
+this.loginButton.setEnabled(true);
+}
+public void clear()
 {
-LoginDialog lg=new LoginDialog();
-lg.setVisible(true);
+this.usernameTextField.setText("");
+this.passwordField.setText("");
+}
+public void displayError(String error)
+{
+JOptionPane.showMessageDialog(this,error);
+}
+public void setLoginDialogEventHandler(LoginDialogEventHandler loginDialogEventHandler)
+{
+this.loginDialogEventHandler=loginDialogEventHandler;
 }
 }

@@ -53,7 +53,7 @@ private void login(Session session,String id,LoginRequest loginRequest)
 Gson gson=new Gson();
 User user=DataModel.getUser(loginRequest.getUsername());
 LoginResponse loginResponse=new LoginResponse();
-if(user==null || user.getUsername().equals(loginRequest.getUsername())==false)
+if(user==null || user.getPassword().equals(loginRequest.getPassword())==false)
 {
 System.out.println("Login Request Rejected");
 loginResponse.setSuccess(false);
@@ -69,6 +69,7 @@ DataModel.addUser(loginRequest.getUsername(),session);
 loginResponse.setOnlineUsers(DataModel.getLoggedInUsers());
 }
 Card card=new Card();
+card.setAction(Action.LOGIN);
 card.setType(CardType.RESPONSE);
 card.setId(id);
 card.setObject(loginResponse);
@@ -117,7 +118,50 @@ x++;
 } //login ends here
 
 private void postMessage(Session session,String id,PostMessageRequest postMessageRequest)
-{}
+{
+String fromUsername=postMessageRequest.getFromUser();
+String message=postMessageRequest.getMessage();
+Gson gson=new Gson();
+AddMessageRequest addMessageRequest=new AddMessageRequest();
+addMessageRequest.setFromUser(fromUsername);
+addMessageRequest.setMessage(message);
+
+//Update Data Model
+Message messageObject=new Message();
+messageObject.setFromUser(fromUsername);
+messageObject.setMessage(message);
+DataModel.addMessage(messageObject);
+
+Card card=new Card();
+card.setAction(Action.ADD_MESSAGE);
+card.setId(UUID.randomUUID().toString());
+card.setType(CardType.REQUEST);
+card.setObject(addMessageRequest);
+String [] loggedInUsers=DataModel.getLoggedInUsers();
+Session userSession;
+for(int i=0;i<loggedInUsers.length;i++)
+{
+if(fromUsername.equals(loggedInUsers[i])==false)
+{
+userSession=DataModel.getUserSession(loggedInUsers[i]);
+if(userSession!=null) addMessageRequestSend(userSession,card,gson);
+}//if ends
+}//for loop ends
+}//method ends
+
+private void addMessageRequestSend(Session userSession,Card card,Gson gson)
+{
+try
+{
+synchronized(userSession)
+{
+userSession.getBasicRemote().sendText(gson.toJson(card));
+}
+}catch(Exception e)
+{
+System.out.println(e);
+}
+}
 
 private void processRequest(Session session,Card card)
 {
