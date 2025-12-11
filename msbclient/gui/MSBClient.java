@@ -68,11 +68,31 @@ if(card.getAction().equals(Action.LOGIN))
 LoginResponse loginResponse=new LoginResponse();
 loginResponse.setSuccess((boolean)map.get("success"));
 ArrayList<String> list=(ArrayList<String>) map.get("onlineUsers");
+ArrayList<LinkedTreeMap> messages=(ArrayList<LinkedTreeMap>) map.get("lastMessages");
 if(list!=null)
 {
 String [] onlineUsers=new String[list.size()];
 list.toArray(onlineUsers);
 loginResponse.setOnlineUsers(onlineUsers); 
+}
+System.out.println("Hurray");
+if(messages!=null)
+{
+System.out.println("Cartoon");
+System.out.println(messages.size()>0);
+System.out.println("size - "+messages.size());
+
+Message [] lastMessages=new Message[messages.size()];
+Message msg;
+for(int i=0;i<messages.size();i++)
+{
+LinkedTreeMap m=messages.get(i);
+msg=new Message();
+msg.setFromUser((String)m.get("fromUser"));
+msg.setMessage((String)m.get("message"));
+lastMessages[i]=msg;
+}
+loginResponse.setLastMessages(lastMessages);
 }
 handleLoginResponse(loginResponse,card.getId());
 }
@@ -93,6 +113,12 @@ this.messageBoardFrame=new MessageBoardFrame(this.username,this);
 }
 this.messageBoardFrame.setOnlineUsers(loginResponse.getOnlineUsers());
 this.messageBoardFrame.setVisible(true);
+Message [] lastMessages=loginResponse.getLastMessages();
+for(int i=0;i<lastMessages.length;i++)
+{
+Message m=lastMessages[i];
+this.messageBoardFrame.addToMessageBoard(m.getFromUser(),m.getMessage());
+}
 }
 else
 {

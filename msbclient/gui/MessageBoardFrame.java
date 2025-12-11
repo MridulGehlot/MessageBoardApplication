@@ -42,6 +42,7 @@ x=desktopDimension.width/2-frameWidth/2;
 y=desktopDimension.height/2-frameHeight/2;
 setSize(frameWidth,frameHeight);
 setLocation(x,y);
+setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 }
 private void initComponents()
 {

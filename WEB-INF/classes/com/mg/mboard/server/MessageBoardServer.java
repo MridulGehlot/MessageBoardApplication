@@ -67,6 +67,8 @@ m.put("username",loginRequest.getUsername());
 loginResponse.setSuccess(true);
 DataModel.addUser(loginRequest.getUsername(),session);
 loginResponse.setOnlineUsers(DataModel.getLoggedInUsers());
+Message [] lastMessages=DataModel.getMessages(100);
+loginResponse.setLastMessages(lastMessages);
 }
 Card card=new Card();
 card.setAction(Action.LOGIN);
